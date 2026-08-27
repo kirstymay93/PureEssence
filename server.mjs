@@ -24,9 +24,9 @@ const server = createServer(async (request, response) => {
   const requestPath = pathname === '/' ? '/index.html' : pathname;
   const safePath = path.normalize(requestPath).replace(/^[/\\]+/, '');
   const filePath = path.resolve(root, safePath);
-  const rootPrefix = `${root}${path.sep}`;
+  const relativePath = path.relative(root, filePath);
 
-  if (filePath !== root && !filePath.startsWith(rootPrefix)) {
+  if (relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
     response.writeHead(403, { 'Content-Type': 'text/plain; charset=utf-8' });
     response.end('Forbidden');
     return;

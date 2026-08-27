@@ -21,6 +21,7 @@ test('homepage includes core landing page sections', async () => {
   assert.match(html, /id="stories"/);
   assert.match(html, /id="contact"/);
   assert.match(html, /autocomplete="email"/);
+  assert.match(html, /aria-labelledby="newsletter-heading"/);
   assert.match(html, /required/);
 });
 
