@@ -74,7 +74,7 @@ jobs:
     - name: Check Azure deployment configuration
       id: azure-config
       run: |
-        if [ -n "${AZURE_WEBAPP_PUBLISH_PROFILE}" ] && [ "${AZURE_WEBAPP_NAME}" != "your-app-name" ]; then
+        if [ -n "${AZURE_WEBAPP_PUBLISH_PROFILE}" ] && [ "${{ env.AZURE_WEBAPP_NAME }}" != "your-app-name" ]; then
           echo "ready=true" >> "$GITHUB_OUTPUT"
         else
           echo "ready=false" >> "$GITHUB_OUTPUT"
