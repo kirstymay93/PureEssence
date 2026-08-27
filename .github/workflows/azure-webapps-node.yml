@@ -26,6 +26,7 @@ env:
   AZURE_WEBAPP_NAME: your-app-name    # set this to your application's name
   AZURE_WEBAPP_PACKAGE_PATH: '.'      # set this to the path to your web app project, defaults to the repository root
   NODE_VERSION: '20.x'                # set this to the node version to use
+  AZURE_WEBAPP_PUBLISH_PROFILE: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
 
 permissions:
   contents: read
@@ -36,17 +37,29 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Set up Node.js
+    - name: Set up Node.js with npm cache
       uses: actions/setup-node@v4
+      if: ${{ hashFiles('package-lock.json', 'npm-shrinkwrap.json') != '' }}
       with:
         node-version: ${{ env.NODE_VERSION }}
         cache: 'npm'
 
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      if: ${{ hashFiles('package-lock.json', 'npm-shrinkwrap.json') == '' }}
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+
     - name: npm install, build, and test
+      if: ${{ hashFiles('package.json') != '' }}
       run: |
         npm install
         npm run build --if-present
         npm run test --if-present
+
+    - name: Skip Node.js build and test
+      if: ${{ hashFiles('package.json') == '' }}
+      run: echo "No package.json found; skipping Node.js build and test."
 
     - name: Upload artifact for deployment job
       uses: actions/upload-artifact@v4
@@ -55,6 +68,7 @@ jobs:
         path: .
 
   deploy:
+    if: ${{ env.AZURE_WEBAPP_NAME != 'your-app-name' && env.AZURE_WEBAPP_PUBLISH_PROFILE != '' }}
     permissions:
       contents: none
     runs-on: ubuntu-latest
@@ -74,5 +88,5 @@ jobs:
       uses: azure/webapps-deploy@v2
       with:
         app-name: ${{ env.AZURE_WEBAPP_NAME }}
-        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+        publish-profile: ${{ env.AZURE_WEBAPP_PUBLISH_PROFILE }}
         package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
