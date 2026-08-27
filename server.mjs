@@ -45,7 +45,16 @@ const server = createServer(async (request, response) => {
     response.writeHead(200, {
       'Content-Type': contentTypes[extension] ?? 'application/octet-stream'
     });
-    createReadStream(filePath).pipe(response);
+
+    const stream = createReadStream(filePath);
+    stream.on('error', () => {
+      if (!response.headersSent) {
+        response.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8' });
+      }
+
+      response.end('Unable to read file');
+    });
+    stream.pipe(response);
   } catch {
     response.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
     response.end('Not found');
