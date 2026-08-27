@@ -312,7 +312,7 @@ blockquote,
 }
 
 .feature-card,
-.testimonial-grid blockquote {
+.testimonial-grid figure {
   border-radius: 24px;
   padding: 1.5rem;
 }
@@ -349,15 +349,18 @@ blockquote,
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(255, 250, 245, 0.95));
 }
 
-.testimonial-grid blockquote {
+.testimonial-grid figure {
   margin: 0;
   background: rgba(255, 255, 255, 0.72);
   border: 1px solid var(--line);
 }
 
-.testimonial-grid footer {
+.testimonial-grid blockquote {
+  margin: 0;
+}
+
+.testimonial-grid figcaption {
   margin-top: 1rem;
-  font-style: normal;
   color: var(--accent-dark);
   font-weight: 600;
 }
