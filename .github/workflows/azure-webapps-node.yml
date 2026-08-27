@@ -61,7 +61,7 @@ jobs:
     needs: build
     env:
       DEPLOY_AZURE_WEBAPP_NAME: ${{ env.AZURE_WEBAPP_NAME }}
-      AZURE_WEBAPP_PUBLISH_PROFILE: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+      AZURE_WEBAPP_PUBLISH_PROFILE_CONFIGURED: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE != '' }}
     environment:
       name: 'Development'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
@@ -73,10 +73,10 @@ jobs:
         name: node-app
 
     - name: 'Deploy to Azure WebApp'
-      if: env.DEPLOY_AZURE_WEBAPP_NAME != 'your-app-name' && env.AZURE_WEBAPP_PUBLISH_PROFILE != ''
+      if: env.DEPLOY_AZURE_WEBAPP_NAME != 'your-app-name' && env.AZURE_WEBAPP_PUBLISH_PROFILE_CONFIGURED == 'true'
       id: deploy-to-webapp
       uses: azure/webapps-deploy@v2
       with:
         app-name: ${{ env.AZURE_WEBAPP_NAME }}
-        publish-profile: ${{ env.AZURE_WEBAPP_PUBLISH_PROFILE }}
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
         package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
