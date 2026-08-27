@@ -2,6 +2,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
 const path = require('path');
+const { execFileSync } = require('child_process');
 
 const root = path.join(__dirname, '..');
 const publicDir = path.join(root, 'public');
@@ -23,7 +24,9 @@ test('home page includes core sections', () => {
 test('build output is created when present', () => {
   const distIndex = path.join(root, 'dist', 'index.html');
 
-  if (fs.existsSync(distIndex)) {
-    assert.match(fs.readFileSync(distIndex, 'utf8'), /PureEssence/);
+  if (!fs.existsSync(distIndex)) {
+    execFileSync(process.execPath, [path.join(root, 'scripts', 'build.js')], { cwd: root });
   }
+
+  assert.match(fs.readFileSync(distIndex, 'utf8'), /PureEssence/);
 });

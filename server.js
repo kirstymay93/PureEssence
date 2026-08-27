@@ -24,7 +24,7 @@ const server = http.createServer((request, response) => {
   const safePath = path.normalize(requestPath).replace(/^(\.\.[/\\])+/, '');
   const filePath = path.join(staticRoot, safePath);
 
-  if (!filePath.startsWith(staticRoot)) {
+  if (filePath !== staticRoot && !filePath.startsWith(`${staticRoot}${path.sep}`)) {
     response.writeHead(403, { 'Content-Type': 'text/plain; charset=utf-8' });
     response.end('Forbidden');
     return;
