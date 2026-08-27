@@ -72,20 +72,11 @@ jobs:
       with:
         name: node-app
 
-    - name: Check Azure deployment configuration
-      id: azure-config
-      run: |
-        if [ -n "${AZURE_WEBAPP_PUBLISH_PROFILE}" ] && [ "${DEPLOY_AZURE_WEBAPP_NAME}" != "your-app-name" ]; then
-          echo "ready=true" >> "$GITHUB_OUTPUT"
-        else
-          echo "ready=false" >> "$GITHUB_OUTPUT"
-        fi
-
     - name: 'Deploy to Azure WebApp'
-      if: steps.azure-config.outputs.ready == 'true'
+      if: env.DEPLOY_AZURE_WEBAPP_NAME != 'your-app-name' && env.AZURE_WEBAPP_PUBLISH_PROFILE != ''
       id: deploy-to-webapp
       uses: azure/webapps-deploy@v2
       with:
         app-name: ${{ env.AZURE_WEBAPP_NAME }}
-        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+        publish-profile: ${{ env.AZURE_WEBAPP_PUBLISH_PROFILE }}
         package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
