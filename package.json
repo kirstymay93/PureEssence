@@ -1,0 +1,22 @@
+{
+  "name": "pureessence",
+  "version": "1.0.0",
+  "description": "PureEssence beauty studio website",
+  "main": "server.js",
+  "scripts": {
+    "build": "node scripts/build.js",
+    "start": "node server.js",
+    "test": "node --test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kirstymay93/PureEssence.git"
+  },
+  "keywords": [
+    "beauty",
+    "website",
+    "node"
+  ],
+  "author": "",
+  "license": "ISC"
+}
