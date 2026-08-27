@@ -1,6 +1,5 @@
 import { createServer } from 'node:http';
 import { createReadStream, existsSync } from 'node:fs';
-import { stat } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -47,34 +46,28 @@ const server = createServer(async (request, response) => {
     return;
   }
 
-  try {
-    const fileStat = await stat(filePath);
+  const extension = path.extname(filePath);
+  const stream = createReadStream(filePath);
+  stream.on('open', () => {
+    response.writeHead(200, {
+      'Content-Type': contentTypes[extension] ?? 'application/octet-stream',
+      'X-Content-Type-Options': 'nosniff'
+    });
+    stream.pipe(response);
+  });
+  stream.on('error', (error) => {
+    if (response.headersSent) {
+      response.destroy();
+      return;
+    }
 
-    if (!fileStat.isFile()) {
+    if (error.code === 'ENOENT' || error.code === 'EISDIR') {
       sendText(response, 404, 'Not found');
       return;
     }
 
-    const extension = path.extname(filePath);
-    const stream = createReadStream(filePath);
-    stream.on('open', () => {
-      response.writeHead(200, {
-        'Content-Type': contentTypes[extension] ?? 'application/octet-stream',
-        'X-Content-Type-Options': 'nosniff'
-      });
-      stream.pipe(response);
-    });
-    stream.on('error', () => {
-      if (response.headersSent) {
-        response.destroy();
-        return;
-      }
-
-      sendText(response, 500, 'Unable to read file');
-    });
-  } catch {
-    sendText(response, 404, 'Not found');
-  }
+    sendText(response, 500, 'Unable to read file');
+  });
 });
 
 server.listen(port, () => {
