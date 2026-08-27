@@ -19,16 +19,31 @@ const contentTypes = {
   '.svg': 'image/svg+xml'
 };
 
+function sendText(response, statusCode, message) {
+  response.writeHead(statusCode, {
+    'Content-Type': 'text/plain; charset=utf-8',
+    'X-Content-Type-Options': 'nosniff'
+  });
+  response.end(message);
+}
+
 const server = createServer(async (request, response) => {
-  const pathname = new URL(request.url || '/', 'http://localhost').pathname;
+  let pathname;
+
+  try {
+    pathname = new URL(request.url || '/', 'http://localhost').pathname;
+  } catch {
+    sendText(response, 400, 'Bad request');
+    return;
+  }
+
   const requestPath = pathname === '/' ? '/index.html' : pathname;
   const safePath = path.normalize(requestPath).replace(/^[/\\]+/, '');
   const filePath = path.resolve(root, safePath);
   const relativePath = path.relative(root, filePath);
 
   if (relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
-    response.writeHead(403, { 'Content-Type': 'text/plain; charset=utf-8' });
-    response.end('Forbidden');
+    sendText(response, 403, 'Forbidden');
     return;
   }
 
@@ -36,14 +51,14 @@ const server = createServer(async (request, response) => {
     const fileStat = await stat(filePath);
 
     if (!fileStat.isFile()) {
-      response.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
-      response.end('Not found');
+      sendText(response, 404, 'Not found');
       return;
     }
 
     const extension = path.extname(filePath);
     response.writeHead(200, {
-      'Content-Type': contentTypes[extension] ?? 'application/octet-stream'
+      'Content-Type': contentTypes[extension] ?? 'application/octet-stream',
+      'X-Content-Type-Options': 'nosniff'
     });
 
     const stream = createReadStream(filePath);
@@ -53,13 +68,11 @@ const server = createServer(async (request, response) => {
         return;
       }
 
-      response.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8' });
-      response.end('Unable to read file');
+      sendText(response, 500, 'Unable to read file');
     });
     stream.pipe(response);
   } catch {
-    response.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
-    response.end('Not found');
+    sendText(response, 404, 'Not found');
   }
 });
 
