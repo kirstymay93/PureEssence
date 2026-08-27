@@ -56,12 +56,14 @@ const server = createServer(async (request, response) => {
     }
 
     const extension = path.extname(filePath);
-    response.writeHead(200, {
-      'Content-Type': contentTypes[extension] ?? 'application/octet-stream',
-      'X-Content-Type-Options': 'nosniff'
-    });
-
     const stream = createReadStream(filePath);
+    stream.on('open', () => {
+      response.writeHead(200, {
+        'Content-Type': contentTypes[extension] ?? 'application/octet-stream',
+        'X-Content-Type-Options': 'nosniff'
+      });
+      stream.pipe(response);
+    });
     stream.on('error', () => {
       if (response.headersSent) {
         response.destroy();
@@ -70,7 +72,6 @@ const server = createServer(async (request, response) => {
 
       sendText(response, 500, 'Unable to read file');
     });
-    stream.pipe(response);
   } catch {
     sendText(response, 404, 'Not found');
   }
