@@ -9,6 +9,10 @@
     "start": "node server.mjs",
     "test": "node --test"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kirstymay93/PureEssence.git"
+  },
   "keywords": [
     "website",
     "wellness",
