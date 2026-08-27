@@ -1,16 +1,18 @@
 {
   "name": "pureessence",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "PureEssence landing page",
+  "main": "server.mjs",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "node scripts/build.mjs",
+    "start": "node server.mjs",
+    "test": "node --test"
   },
-  "repository": {
-    "type": "git",
-    "url": "http://localhost:26831/kirstymay93/PureEssence"
-  },
-  "keywords": [],
+  "keywords": [
+    "website",
+    "wellness",
+    "landing-page"
+  ],
   "author": "",
   "license": "ISC"
 }
