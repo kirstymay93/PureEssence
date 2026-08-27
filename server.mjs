@@ -48,10 +48,12 @@ const server = createServer(async (request, response) => {
 
     const stream = createReadStream(filePath);
     stream.on('error', () => {
-      if (!response.headersSent) {
-        response.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8' });
+      if (response.headersSent) {
+        response.destroy();
+        return;
       }
 
+      response.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8' });
       response.end('Unable to read file');
     });
     stream.pipe(response);
