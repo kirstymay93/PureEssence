@@ -9,11 +9,21 @@ if (year) {
 if (form && status) {
   form.addEventListener('submit', (event) => {
     event.preventDefault();
-    const formData = new FormData(form);
-    const email = String(formData.get('email') ?? '').trim();
+    const emailField = form.elements.namedItem('email');
 
-    if (!email) {
-      status.textContent = 'Please enter your email address to join the newsletter.';
+    if (!(emailField instanceof HTMLInputElement)) {
+      status.textContent = 'Please enter a valid email address to join the newsletter.';
+      return;
+    }
+
+    emailField.value = emailField.value.trim();
+    const email = emailField.value;
+
+    if (!emailField.checkValidity()) {
+      status.textContent = email
+        ? 'Please enter a valid email address to join the newsletter.'
+        : 'Please enter your email address to join the newsletter.';
+      emailField.reportValidity();
       return;
     }
 
