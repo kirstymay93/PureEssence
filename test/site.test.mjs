@@ -33,5 +33,6 @@ test('build output preserves stylesheet and script references', async () => {
   assert.match(html, /styles\.css/);
   assert.match(html, /main\.js/);
   assert.match(css, /--accent-dark/);
+  assert.match(script, /checkValidity/);
   assert.match(script, /PureEssence updates are on the way/);
 });
