@@ -20,6 +20,8 @@ test('homepage includes core landing page sections', async () => {
   assert.match(html, /id="ritual"/);
   assert.match(html, /id="stories"/);
   assert.match(html, /id="contact"/);
+  assert.match(html, /autocomplete="email"/);
+  assert.match(html, /required/);
 });
 
 test('build output preserves stylesheet and script references', async () => {

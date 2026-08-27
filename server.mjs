@@ -22,8 +22,15 @@ const contentTypes = {
 const server = createServer(async (request, response) => {
   const pathname = new URL(request.url ?? '/', 'http://localhost').pathname;
   const requestPath = pathname === '/' ? '/index.html' : pathname;
-  const safePath = path.normalize(requestPath).replace(/^([.][.][/\\])+/, '');
-  const filePath = path.join(root, safePath);
+  const safePath = path.normalize(requestPath).replace(/^[/\\]+/, '');
+  const filePath = path.resolve(root, safePath);
+  const rootPrefix = `${root}${path.sep}`;
+
+  if (filePath !== root && !filePath.startsWith(rootPrefix)) {
+    response.writeHead(403, { 'Content-Type': 'text/plain; charset=utf-8' });
+    response.end('Forbidden');
+    return;
+  }
 
   try {
     const fileStat = await stat(filePath);
