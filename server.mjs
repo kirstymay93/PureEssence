@@ -20,7 +20,7 @@ const contentTypes = {
 };
 
 const server = createServer(async (request, response) => {
-  const pathname = new URL(request.url ?? '/', 'http://localhost').pathname;
+  const pathname = new URL(request.url || '/', 'http://localhost').pathname;
   const requestPath = pathname === '/' ? '/index.html' : pathname;
   const safePath = path.normalize(requestPath).replace(/^[/\\]+/, '');
   const filePath = path.resolve(root, safePath);
